@@ -2,6 +2,7 @@
 import { fetchManifest, fetchData, VARIABLES } from './data.js';
 import * as mapMod   from './map.js';
 import * as chartMod from './chart.js';
+const _needsOtherData = () => ['scatter', 'bland-altman', 'histogram', 'cdf', 'pctdiff', 'qqplot'].includes(_chartType);
 
 let _manifest    = null;
 let _currentData = null;
@@ -62,7 +63,7 @@ export async function init() {
   document.getElementById('select-chart-type').addEventListener('change', async e => {
     _chartType = e.target.value;
     chartMod.setChartType(_chartType);
-    if (_chartType === 'scatter' && !_otherData && _currentData) {
+    if (_needsOtherData() && !_otherData && _currentData) {
       await _loadOtherData();
     }
     _renderChart();
@@ -72,6 +73,18 @@ export async function init() {
   document.getElementById('btn-chart').addEventListener('click', () => chartMod.toggleModal());
   document.getElementById('chart-modal-close').addEventListener('click', () => chartMod.closeModal());
   document.addEventListener('keydown', e => { if (e.key === 'Escape') chartMod.closeModal(); });
+
+  // Download chart CSV
+  document.getElementById('btn-download-chart-csv').addEventListener('click', () => {
+    if (_currentData) _downloadChartCSV(_applyFilter(_currentData), _otherData ? _applyFilter(_otherData) : null);
+  });
+
+  // Download chart PNG
+  document.getElementById('btn-download-chart').addEventListener('click', () => {
+    const title = document.getElementById('chart-modal-title').textContent.trim()
+      .replace(/[^\w\s\-]/g, '').replace(/\s+/g, '_').toLowerCase() || 'chart';
+    chartMod.downloadChart(`${title}.png`);
+  });
 
   // Error banner close
   document.getElementById('error-close').addEventListener('click', () => {
@@ -190,7 +203,7 @@ async function _loadData(keepView = false) {
     const data = await fetchData(_run, _ship, _year, _res);
     if (seq !== _loadSeq) return;
     _currentData = data;
-    if (_chartType === 'scatter') {
+    if (_needsOtherData()) {
       try { _otherData = await fetchData(_otherRun(), _ship, _year, _res); }
       catch { _otherData = null; }
       if (seq !== _loadSeq) return;
@@ -316,6 +329,24 @@ function _renderChart() {
   const f1 = _applyFilter(_currentData);
   if (_chartType === 'scatter') {
     if (_otherData) chartMod.renderScatter(f1, _applyFilter(_otherData), _varKey);
+  } else if (_chartType === 'bland-altman') {
+    if (_otherData) chartMod.renderBlandAltman(f1, _applyFilter(_otherData), _varKey);
+  } else if (_chartType === 'histogram') {
+    if (_otherData) chartMod.renderHistDiff(f1, _applyFilter(_otherData), _varKey);
+  } else if (_chartType === 'cdf') {
+    if (_otherData) chartMod.renderCDF(f1, _applyFilter(_otherData), _varKey);
+  } else if (_chartType === 'pctdiff') {
+    if (_otherData) chartMod.renderPctDiff(f1, _applyFilter(_otherData), _varKey);
+  } else if (_chartType === 'qqplot') {
+    if (_otherData) chartMod.renderQQPlot(f1, _applyFilter(_otherData), _varKey);
+  } else if (_chartType === 'boxplot') {
+    chartMod.renderBoxplot(f1, _varKey);
+  } else if (_chartType === 'diurnal') {
+    chartMod.renderDiurnal(f1, _varKey);
+  } else if (_chartType === 'latvar') {
+    chartMod.renderLatVar(f1, _varKey);
+  } else if (_chartType === 'heatmap') {
+    chartMod.renderHeatmap(f1);
   } else {
     chartMod.render(f1, _varKey);
   }
@@ -339,3 +370,54 @@ function _showError(msg) {
 function _hideError() {
   document.getElementById('error-banner').style.display = 'none';
 }
+
+const _TWO_RUN_TYPES = new Set(['scatter','bland-altman','histogram','cdf','pctdiff','qqplot']);
+const _DATA_COLS = ['hfss_m','hfss_s','hfls_m','hfls_s','tau_m','tau_s','dmo','T_s','TS_s','RH_s','P_s','SPD_s','enthalpy_m','enthalpy_s'];
+
+function _downloadChartCSV(data1, data2) {
+  const isTwoRun = _TWO_RUN_TYPES.has(_chartType) && data2;
+  const stem = `${_ship}_${_year}_${_chartType}`;
+  let rows;
+
+  if (isTwoRun) {
+    // Inner-join on timestamps; emit r1_ and r2_ prefixed columns
+    const tsMap = new Map();
+    for (let j = 0; j < data2.n; j++) {
+      if (data2.timestamps[j] != null) tsMap.set(data2.timestamps[j], j);
+    }
+    const header = ['time','lat','lon', ..._DATA_COLS.map(k => `r1_${k}`), ..._DATA_COLS.map(k => `r2_${k}`)];
+    rows = [header.join(',')];
+    for (let i = 0; i < data1.n; i++) {
+      const ts = data1.timestamps[i];
+      if (ts == null) continue;
+      const j = tsMap.get(ts);
+      if (j === undefined) continue;
+      const row = [
+        new Date(ts).toISOString(),
+        data1.lat?.[i] ?? '', data1.lon?.[i] ?? '',
+        ..._DATA_COLS.map(k => data1[k]?.[i] ?? ''),
+        ..._DATA_COLS.map(k => data2[k]?.[j] ?? ''),
+      ];
+      rows.push(row.join(','));
+    }
+  } else {
+    const header = ['time','lat','lon',..._DATA_COLS];
+    rows = [header.join(',')];
+    for (let i = 0; i < data1.n; i++) {
+      const ts = data1.timestamps[i];
+      rows.push([
+        ts != null ? new Date(ts).toISOString() : '',
+        data1.lat?.[i] ?? '', data1.lon?.[i] ?? '',
+        ..._DATA_COLS.map(k => data1[k]?.[i] ?? ''),
+      ].join(','));
+    }
+  }
+
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${stem}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+

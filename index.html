@@ -81,7 +81,32 @@
         <select id="select-chart-type" title="Chart type">
           <option value="timeseries">Time Series</option>
           <option value="scatter">Run 1 vs Run 2</option>
+          <option value="bland-altman">Bland-Altman</option>
+          <option value="histogram">Diff Histogram</option>
+          <option value="cdf">CDF</option>
+          <option value="pctdiff">% Difference</option>
+          <option value="qqplot">Q-Q Plot</option>
+          <option value="boxplot">Box Plot (Monthly)</option>
+          <option value="diurnal">Diurnal Composite</option>
+          <option value="latvar">Lat vs Variable</option>
+          <option value="heatmap">Correlation Heatmap</option>
         </select>
+        <button id="btn-download-chart-csv" class="ctrl-violet" title="Download chart data as CSV">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6.5" y1="1" x2="6.5" y2="8.5"/>
+            <polyline points="3.5,6 6.5,9 9.5,6"/>
+            <line x1="1.5" y1="12" x2="11.5" y2="12"/>
+          </svg>
+          CSV
+        </button>
+        <button id="btn-download-chart" class="ctrl-violet" title="Download chart as PNG">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6.5" y1="1" x2="6.5" y2="8.5"/>
+            <polyline points="3.5,6 6.5,9 9.5,6"/>
+            <line x1="1.5" y1="12" x2="11.5" y2="12"/>
+          </svg>
+          PNG
+        </button>
         <button id="chart-modal-close">×</button>
       </div>
     </div>
