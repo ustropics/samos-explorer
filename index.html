@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAMOS Ship Explorer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚢</text></svg>" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav id="navbar">
+    <span class="app-title">SAMOS Ship Explorer</span>
+    <select id="select-ship" title="Ship"></select>
+    <select id="select-year" title="Year"></select>
+
+    <div class="nav-sep"></div>
+
+    <select id="select-variable" class="ctrl-cyan" title="Variable"></select>
+    <div class="btn-group ctrl-cyan" id="run-group">
+      <button data-run="mars" class="active">Run 1</button>
+      <button data-run="yuc">Run 2</button>
+    </div>
+
+    <div class="nav-sep"></div>
+
+    <div class="btn-group ctrl-cyan" id="res-group">
+      <button data-res="1d">1d</button>
+      <button data-res="1h" class="active">1h</button>
+      <button data-res="30m">30m</button>
+      <button data-res="10m">10m</button>
+      <button data-res="1min">1min</button>
+    </div>
+    <span class="date-label">From</span>
+    <select id="filter-start-month" class="ctrl-cyan" title="Start month"><option value="">—</option></select>
+    <select id="filter-start-day" class="ctrl-cyan" title="Start day"><option value="">—</option></select>
+    <span class="date-label">To</span>
+    <select id="filter-end-month" class="ctrl-cyan" title="End month"><option value="">—</option></select>
+    <select id="filter-end-day" class="ctrl-cyan" title="End day"><option value="">—</option></select>
+
+    <div class="nav-spacer"></div>
+
+    <button id="btn-markers" class="ctrl-violet active">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="currentColor"><circle cx="5.5" cy="5.5" r="4.5"/></svg>
+      Markers
+    </button>
+    <button id="btn-track" class="ctrl-violet active">
+      <svg width="14" height="11" viewBox="0 0 14 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><polyline points="1,10 4,4.5 7,7 10,2.5 13,5.5"/></svg>
+      Track
+    </button>
+
+    <button id="btn-chart">
+      <svg width="13" height="12" viewBox="0 0 13 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <polyline points="1,11 4,5.5 7,7.5 12,1.5"/>
+        <line x1="1" y1="11" x2="12" y2="11"/>
+      </svg>
+      Chart
+    </button>
+  </nav>
+
+  <div id="error-banner">
+    <span id="error-text"></span>
+    <button id="error-close">×</button>
+  </div>
+
+  <div id="map-container">
+    <div id="map"></div>
+    <div id="map-tooltip" class="hidden"></div>
+    <div id="map-loading" class="hidden"><div class="spinner"></div></div>
+  </div>
+
+  <div id="chart-modal">
+    <div id="chart-modal-handle">
+      <span id="chart-modal-title">Time Series</span>
+      <div class="modal-handle-right">
+        <select id="select-chart-type" title="Chart type">
+          <option value="timeseries">Time Series</option>
+          <option value="scatter">Run 1 vs Run 2</option>
+        </select>
+        <button id="chart-modal-close">×</button>
+      </div>
+    </div>
+    <div id="chart-container">
+      <canvas id="chart-canvas"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import { init } from './js/ui.js';
+    init().catch(err => {
+      document.getElementById('error-text').textContent = 'Initialization error: ' + err.message;
+      document.getElementById('error-banner').style.display = 'flex';
+    });
+  </script>
+</body>
+</html>
