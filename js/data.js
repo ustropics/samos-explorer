@@ -21,14 +21,16 @@ export const VARIABLES = [
   { key: 'SPD_s',     label: 'Wind Speed Stdv' },
 ];
 
+const R2_BASE_URL = 'https://pub-889e6578da3a46b0a63deecd0b051bdf.r2.dev';
+
 export async function fetchManifest() {
-  const resp = await fetch('data/manifest.json');
+  const resp = await fetch(`${R2_BASE_URL}/manifest.json`);
   if (!resp.ok) throw new Error(`Failed to load manifest (${resp.status})`);
   return resp.json();
 }
 
 export async function fetchData(run, ship, year, resolution) {
-  const path = `data/${run}/${ship}/${ship}_${year}_${resolution}.json`;
+  const path = `${R2_BASE_URL}/${run}/${ship}/${ship}_${year}_${resolution}.json`;
   const resp = await fetch(path);
   if (!resp.ok) {
     const runLabel = Object.keys(RUNS).find(k => RUNS[k] === run) ?? run;
