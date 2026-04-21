@@ -5,20 +5,20 @@ export const RUNS = { 'Run 1': 'mars', 'Run 2': 'yuc' };
 export const RESOLUTIONS = ['1d', '1h', '30m', '10m', '1min'];
 
 export const VARIABLES = [
-  { key: 'enthalpy_m', label: 'Enthalpy Flux Mean' },
-  { key: 'enthalpy_s', label: 'Enthalpy Flux Stdv' },
-  { key: 'hfss_m',    label: 'Sensible Heat Mean' },
-  { key: 'hfss_s',    label: 'Sensible Heat Stdv' },
-  { key: 'hfls_m',    label: 'Latent Heat Mean' },
-  { key: 'hfls_s',    label: 'Latent Heat Stdv' },
-  { key: 'tau_m',     label: 'Wind Stress Mean' },
-  { key: 'tau_s',     label: 'Wind Stress Stdv' },
-  { key: 'dmo',       label: 'DMO' },
-  { key: 'T_s',       label: 'Air Temp Stdv' },
-  { key: 'TS_s',      label: 'Sea Temp Stdv' },
-  { key: 'RH_s',      label: 'Humidity Stdv' },
-  { key: 'P_s',       label: 'Pressure Stdv' },
-  { key: 'SPD_s',     label: 'Wind Speed Stdv' },
+  { key: 'enthalpy_m', label: 'Enthalpy Flux Mean', unit: 'W/m²' },
+  { key: 'enthalpy_s', label: 'Enthalpy Flux Stdv', unit: 'W/m²' },
+  { key: 'hfss_m',    label: 'Sensible Heat Mean',  unit: 'W/m²' },
+  { key: 'hfss_s',    label: 'Sensible Heat Stdv',  unit: 'W/m²' },
+  { key: 'hfls_m',    label: 'Latent Heat Mean',    unit: 'W/m²' },
+  { key: 'hfls_s',    label: 'Latent Heat Stdv',    unit: 'W/m²' },
+  { key: 'tau_m',     label: 'Wind Stress Mean',    unit: 'N/m²' },
+  { key: 'tau_s',     label: 'Wind Stress Stdv',    unit: 'N/m²' },
+  { key: 'dmo',       label: 'DMO',                 unit: 'm'    },
+  { key: 'T_s',       label: 'Air Temp Stdv',       unit: '°C'   },
+  { key: 'TS_s',      label: 'Sea Temp Stdv',       unit: '°C'   },
+  { key: 'RH_s',      label: 'Humidity Stdv',       unit: '%'    },
+  { key: 'P_s',       label: 'Pressure Stdv',       unit: 'hPa'  },
+  { key: 'SPD_s',     label: 'Wind Speed Stdv',     unit: 'm/s'  },
 ];
 
 const R2_BASE_URL = 'https://pub-889e6578da3a46b0a63deecd0b051bdf.r2.dev';

@@ -286,6 +286,47 @@ button:hover { background: var(--surface-hi); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Map colorbar ───────────────────────────────────── */
+#map-colorbar {
+  position: absolute;
+  bottom: 24px;
+  left: 12px;
+  z-index: 500;
+  background: rgba(8,13,24,0.88);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 8px;
+  padding: 8px 10px 6px;
+  width: 140px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+#map-colorbar.hidden { display: none; }
+.cb-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--cyan-text);
+  margin-bottom: 5px;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+.cb-bar {
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(to right,
+    rgb(68,1,84), rgb(72,40,120), rgb(62,74,137), rgb(49,104,142),
+    rgb(38,130,142), rgb(31,158,137), rgb(53,183,121), rgb(110,206,88),
+    rgb(181,222,43), rgb(253,231,37));
+  margin-bottom: 4px;
+}
+.cb-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  color: var(--text-bright);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  letter-spacing: -0.2px;
+}
+
 /* ── Chart modal ────────────────────────────────────── */
 #chart-modal {
   position: fixed;

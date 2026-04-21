@@ -1,6 +1,28 @@
 // webapp/js/map.js
 import { VARIABLES } from './data.js';
 
+function _fmtNum(v) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  const abs = Math.abs(v);
+  if (abs === 0) return '0';
+  if (abs >= 1000) return v.toFixed(0);
+  if (abs >= 10)   return v.toFixed(1);
+  if (abs >= 1)    return v.toFixed(2);
+  return v.toPrecision(3);
+}
+
+function _updateColorbar(vmin, vmax, varKey) {
+  const el = document.getElementById('map-colorbar');
+  if (!el) return;
+  const varInfo = VARIABLES.find(v => v.key === varKey);
+  const label = varInfo ? varInfo.label : varKey;
+  const unit  = varInfo?.unit ?? '';
+  el.querySelector('.cb-label').textContent = label;
+  el.querySelector('.cb-min').textContent   = _fmtNum(vmin) + (unit ? '\u00a0' + unit : '');
+  el.querySelector('.cb-max').textContent   = _fmtNum(vmax) + (unit ? '\u00a0' + unit : '');
+  el.classList.remove('hidden');
+}
+
 const VIRIDIS = [
   [68,  1,  84], [72, 40, 120], [62, 74, 137], [49, 104, 142],
   [38, 130, 142], [31, 158, 137], [53, 183, 121], [110, 206,  88],
@@ -224,6 +246,7 @@ export function render(data, varKey, keepView = false) {
   if (!_polylinesVisible) _map.removeLayer(_polylineLayer);
 
   if (!keepView && validBounds.length) _map.fitBounds(validBounds, { padding: [20, 20] });
+  _updateColorbar(vmin, vmax, varKey);
 }
 
 export function setLayerVisible(layer, visible) {
